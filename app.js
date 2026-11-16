@@ -352,7 +352,13 @@ function guestView() {
 
   return `
   <section class="guest-hero">
-    <div>
+    <div class="hero-art">
+      <div class="hero-fallback" aria-hidden="true"><div class="glass"><span>🥤</span></div></div>
+      <img class="hero-person" src="hero-cendol.png" alt="Perempuan menikmati cendol susu Censu'D"
+           onerror="if (this.dataset.tried) { this.remove(); } else { this.dataset.tried = '1'; this.src = 'hero-cendol.jpg'; }">
+      <div class="price-sticker">mulai dari<b>Rp 6K</b></div>
+    </div>
+    <div class="hero-copy">
       <p class="eyebrow">Segar · Manis · Rumahan</p>
       <h1>ES CENDOL<br>SUSU</h1>
       <p>Nikmati kesegaran cendol dawet dengan tiga rasa favorit: Original, Gula Aren, dan Coklat. Semuanya Rp 6.000 per gelas.</p>
@@ -360,10 +366,6 @@ function guestView() {
         <a class="btn btn-primary" href="#guest-menu">Lihat menu</a>
         <a class="btn btn-outline" href="${waLink}" target="_blank" rel="noopener noreferrer">Hubungi kami</a>
       </div>
-    </div>
-    <div class="hero-art">
-      <div class="glass"><span aria-hidden="true">🥤</span></div>
-      <div class="price-sticker">mulai dari<b>Rp 6K</b></div>
     </div>
   </section>
 
