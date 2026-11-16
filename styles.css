@@ -101,6 +101,10 @@ h1,h2,h3{overflow-wrap:break-word}
 .field textarea{min-height:72px;resize:vertical}
 .field input:focus,.field select:focus,.field textarea:focus{outline:2px solid #b6e8bb;border-color:#9bd3a0}
 .field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.field small{color:var(--muted);font-size:.75rem;line-height:1.45}
+.wa-preview{display:grid;gap:6px;border:1px solid var(--line);border-radius:12px;background:#fbfdfb;padding:14px}
+.wa-preview strong{font-size:1.12rem;color:var(--deep);letter-spacing:.02em}
+.wa-preview a{font-size:.8rem;color:var(--green);word-break:break-all}
 .check{display:flex;align-items:center;gap:8px;font-size:.85rem;margin:2px 0 14px}
 .check input{width:auto}
 .form-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}

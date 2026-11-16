@@ -112,6 +112,18 @@ function formatDateKey(key) {
   return date.toLocaleDateString("id-ID", { day: "2-digit", month: "long", year: "numeric" });
 }
 
+function normalizeWa(raw) {
+  let digits = String(raw || "").replace(/\D/g, "");
+  if (digits.startsWith("0")) digits = "62" + digits.slice(1);
+  else if (digits.startsWith("8")) digits = "62" + digits;
+  return digits;
+}
+
+function waNumber() {
+  const stored = db && db.settings ? normalizeWa(db.settings.waNumber) : "";
+  return /^62\d{8,13}$/.test(stored) ? stored : WA_NUMBER;
+}
+
 function randSalt() {
   return Math.random().toString(36).slice(2, 10) + Math.random().toString(36).slice(2, 10);
 }
@@ -176,7 +188,8 @@ function seedDB() {
     createdAt: new Date().toISOString(),
     users: SEED_USERS.map((u) => makeUser(u.nama, u.username, u.pin, u.role)),
     products: SEED_PRODUCTS.map((p) => Object.assign({}, p)),
-    transactions: []
+    transactions: [],
+    settings: { waNumber: WA_NUMBER }
   };
 }
 
@@ -187,6 +200,10 @@ function initDB() {
       const parsed = JSON.parse(raw);
       if (parsed && Array.isArray(parsed.users) && Array.isArray(parsed.products) && Array.isArray(parsed.transactions)) {
         db = parsed;
+        if (!db.settings || typeof db.settings.waNumber !== "string") {
+          db.settings = { waNumber: WA_NUMBER };
+          persist();
+        }
         return;
       }
     } catch (err) {
@@ -284,7 +301,7 @@ function renderHeader() {
   } else {
     const tabs = role === "kasir"
       ? [["kasir", "Kasir"], ["riwayat", "Riwayat"]]
-      : [["ringkasan", "Ringkasan"], ["menu", "Menu"], ["transaksi", "Transaksi"], ["akun", "Akun"]];
+      : [["ringkasan", "Ringkasan"], ["menu", "Menu"], ["transaksi", "Transaksi"], ["akun", "Akun"], ["pengaturan", "Pengaturan"]];
     nav.innerHTML = tabs.map(([id, label]) => (
       `<button type="button" class="nav-link ${state.tab[role] === id ? "active" : ""}" data-action="tab" data-tab="${id}">${label}</button>`
     )).join("");
@@ -318,6 +335,7 @@ function renderView() {
   if (tab === "menu") root.innerHTML = adminMenuView();
   else if (tab === "transaksi") root.innerHTML = adminTxView();
   else if (tab === "akun") root.innerHTML = adminAkunView();
+  else if (tab === "pengaturan") root.innerHTML = adminSettingsView();
   else root.innerHTML = adminHomeView();
 }
 
@@ -348,7 +366,7 @@ function productCard(p) {
 
 function guestView() {
   const menu = db.products.filter((p) => p.aktif);
-  const waLink = "https://wa.me/" + WA_NUMBER + "?text=" + encodeURIComponent("Halo Censu'D, saya ingin bertanya tentang menu cendol.");
+  const waLink = "https://wa.me/" + waNumber() + "?text=" + encodeURIComponent("Halo Censu'D, saya ingin bertanya tentang menu cendol.");
 
   return `
   <section class="guest-hero">
@@ -397,7 +415,7 @@ function orderGuest(id) {
   const product = db.products.find((p) => p.id === id);
   if (!product) return;
   const message = "Halo Censu'D, saya ingin memesan " + product.nama + " (" + product.rasa + ") seharga " + rp(product.harga) + ". Apakah masih tersedia?";
-  window.open("https://wa.me/" + WA_NUMBER + "?text=" + encodeURIComponent(message), "_blank", "noopener,noreferrer");
+  window.open("https://wa.me/" + waNumber() + "?text=" + encodeURIComponent(message), "_blank", "noopener,noreferrer");
 }
 
 /* ---------- kasir ---------- */
@@ -954,6 +972,65 @@ function adminAkunView() {
   </div>`;
 }
 
+function adminSettingsView() {
+  const wa = waNumber();
+  const preview = "https://wa.me/" + wa;
+
+  return `
+  <div class="page-head">
+    <div>
+      <p class="eyebrow">Admin</p>
+      <h1>Pengaturan toko</h1>
+      <p>Nomor WhatsApp ini dipakai semua tombol pesan di halaman tamu.</p>
+    </div>
+    <div class="head-actions">
+      <a class="btn btn-outline btn-sm" href="${preview}" target="_blank" rel="noopener noreferrer">Tes chat</a>
+    </div>
+  </div>
+
+  <div class="admin-grid">
+    <form class="panel" id="waForm">
+      <div class="panel-head"><h2>Nomor WhatsApp</h2></div>
+      <div class="field">
+        <label for="waNumber">Nomor WhatsApp *</label>
+        <input id="waNumber" type="tel" inputmode="tel" maxlength="20" required placeholder="6281234567890" value="${esc(wa)}">
+        <small>Format internasional tanpa tanda +, misalnya 6281234567890. Nomor berawalan 0 otomatis diubah.</small>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit">Simpan nomor</button>
+        <button class="btn btn-outline" type="button" data-action="reset-wa">Kembalikan default</button>
+      </div>
+    </form>
+
+    <section class="panel">
+      <div class="panel-head"><h2>Pratinjau tautan</h2></div>
+      <p class="muted" style="margin:0 0 12px;font-size:.84rem">Tamu akan diarahkan ke nomor berikut saat menekan tombol pesan.</p>
+      <div class="wa-preview">
+        <span class="badge badge-ok">Aktif</span>
+        <strong>+${esc(wa)}</strong>
+        <a href="${preview}" target="_blank" rel="noopener noreferrer">${preview}</a>
+      </div>
+      <div class="field" style="margin-top:16px;margin-bottom:0">
+        <label for="waMessagePreview">Contoh pesan tamu</label>
+        <textarea id="waMessagePreview" readonly rows="3">Halo Censu'D, saya ingin memesan Cendol Original (Original) seharga Rp 6.000. Apakah masih tersedia?</textarea>
+      </div>
+    </section>
+  </div>`;
+}
+
+function saveWaNumber(event) {
+  event.preventDefault();
+  const digits = normalizeWa($("#waNumber").value);
+  if (!/^62\d{8,13}$/.test(digits)) {
+    notify("Nomor WhatsApp tidak valid. Contoh: 6281234567890.");
+    return;
+  }
+  db.settings = Object.assign({}, db.settings, { waNumber: digits });
+  persist();
+  renderApp();
+  notify("Nomor WhatsApp diperbarui.");
+}
+
 /* ---------- aksi produk & akun ---------- */
 
 function saveProduct(event) {
@@ -1295,6 +1372,12 @@ function onActionClick(event) {
       state.editingUser = null;
       renderApp();
       break;
+    case "reset-wa":
+      db.settings = Object.assign({}, db.settings, { waNumber: WA_NUMBER });
+      persist();
+      renderApp();
+      notify("Nomor WhatsApp dikembalikan ke default.");
+      break;
     case "reset-demo":
       resetDemo();
       break;
@@ -1329,6 +1412,7 @@ function onChange(event) {
 function onSubmit(event) {
   if (event.target.id === "productForm") saveProduct(event);
   else if (event.target.id === "userForm") saveUser(event);
+  else if (event.target.id === "waForm") saveWaNumber(event);
 }
 
 /* ---------- boot ---------- */
