@@ -34,8 +34,8 @@ h1,h2,h3{overflow-wrap:break-word}
 .login-band{display:flex;align-items:center;gap:12px;margin-bottom:18px}
 .login-band strong{font:900 1.1rem Georgia,serif;letter-spacing:.06em;display:block}
 .login-band small{display:block;color:var(--muted);font-size:.76rem}
-.logo{width:44px;height:44px;border-radius:50%;background:#fff;color:var(--green);display:grid;place-items:center;border:3px solid #a4f5a7;font:900 21px Georgia,serif;flex:0 0 auto}
-.logo-lg{width:52px;height:52px;font-size:25px}
+.logo-img{display:block;width:42px;height:42px;border-radius:50%;object-fit:cover;background:#fff;flex:0 0 auto}
+.logo-img-lg{width:54px;height:54px}
 .login h1{font:700 1.9rem Georgia,serif;color:var(--deep);margin:0 0 6px}
 .login-sub{color:var(--muted);font-size:.88rem;line-height:1.55;margin:0 0 18px}
 .role-picker{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
@@ -67,7 +67,7 @@ h1,h2,h3{overflow-wrap:break-word}
 /* ---------- shell ---------- */
 .topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:16px;justify-content:space-between;padding:10px clamp(16px,4vw,40px);background:var(--deep);color:#fff;box-shadow:0 6px 18px rgba(0,0,0,.15)}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:900;letter-spacing:.06em;font-size:.95rem}
-.brand .logo{width:38px;height:38px;border-width:2px;font-size:18px}
+.brand .logo-img{width:38px;height:38px}
 .nav{display:flex;gap:4px;align-items:center;flex-wrap:wrap;margin-left:auto}
 .nav-link{background:none;border:0;color:#dcf5dc;text-decoration:none;font-weight:650;font-size:.88rem;padding:8px 12px;border-radius:8px;white-space:nowrap}
 .nav-link:hover{color:#fff;background:rgba(255,255,255,.08)}
