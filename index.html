@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b3b05">
+<title>Censu'D — Kasir &amp; Menu Cendol</title>
+<link rel="stylesheet" href="styles.css">
+<script src="app.js" defer></script>
+</head>
+<body>
+
+<div class="login" id="loginScreen">
+  <div class="login-panel">
+    <div class="login-band">
+      <span class="logo logo-lg">C</span>
+      <div><strong>CENSU'D</strong><small>POS Cendol Rumahan</small></div>
+    </div>
+    <h1>Masuk ke aplikasi</h1>
+    <p class="login-sub">Pilih peran lalu masukkan username dan PIN. Tamu dapat langsung melihat menu tanpa PIN.</p>
+
+    <div class="role-picker" id="rolePicker" aria-label="Pilih peran">
+      <button type="button" class="role-card active" data-role="kasir">
+        <span class="role-icon" aria-hidden="true">🧾</span><strong>Kasir</strong><small>Transaksi &amp; struk</small>
+      </button>
+      <button type="button" class="role-card" data-role="admin">
+        <span class="role-icon" aria-hidden="true">🗂️</span><strong>Admin</strong><small>Menu, akun &amp; laporan</small>
+      </button>
+    </div>
+
+    <form id="loginForm">
+      <div class="field">
+        <label for="loginUser">Username</label>
+        <input id="loginUser" name="username" autocomplete="username" placeholder="admin / kasir" required>
+      </div>
+      <div class="field">
+        <label for="loginPin">PIN</label>
+        <input id="loginPin" name="pin" type="password" inputmode="numeric" autocomplete="current-password" placeholder="••••••" required>
+      </div>
+      <p class="form-error hidden" id="loginError" role="alert"></p>
+      <button class="btn btn-primary btn-block" type="submit">Masuk</button>
+    </form>
+
+    <div class="or"><span>atau</span></div>
+    <button class="btn btn-outline btn-block" type="button" id="guestBtn">Masuk sebagai tamu</button>
+
+    <div class="demo-box">
+      <strong>Akun demo</strong>
+      <span><b>Admin</b> admin / admin123</span>
+      <span><b>Kasir</b> kasir / kasir123</span>
+      <span><b>Tamu</b> tanpa PIN</span>
+    </div>
+  </div>
+</div>
+
+<div id="app" class="hidden">
+  <header class="topbar">
+    <a class="brand" href="#" data-action="home">
+      <span class="logo">C</span><span>CENSU'D</span>
+    </a>
+    <nav class="nav" id="mainNav" aria-label="Navigasi utama"></nav>
+    <div class="user-chip" id="userChip"></div>
+  </header>
+  <main class="page" id="viewRoot"></main>
+</div>
+
+<div class="modal hidden" id="modal" role="dialog" aria-modal="true" aria-label="Detail">
+  <div class="modal-card" id="modalCard"></div>
+</div>
+
+<div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+</body>
+</html>
